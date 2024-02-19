@@ -20,8 +20,6 @@ const INTERACT_ON_END = "end";
 
 const SWIPE_LEFT = "swipe-left";
 const SWIPE_RIGHT = "swipe-right";
-const SWIPE_TOP = "swipe-top";
-const SWIPE_BOTTOM = "swipe-bottom";
 const SWIPE_ANY = "swipe";
 
 export default {
@@ -42,21 +40,11 @@ export default {
       default: 500,
       required: false,
     },
-    outOfSightYOffset: {
-      type: Number,
-      default: 500,
-      required: false,
-    },
     thresholdX: {
       type: Number,
       default: 50,
       required: false,
-    },
-    thresholdY: {
-      type: Number,
-      default: 70,
-      required: false,
-    },
+    }
   },
   data() {
     return {
@@ -97,14 +85,12 @@ export default {
       },
       onend: () => {
         this.$emit(INTERACT_ON_END);
-        const { x, y } = this.interactPosition;
-        const { thresholdX, thresholdY } = this.$props;
+        const { x} = this.interactPosition;
+        const { thresholdX } = this.$props;
         this.isDragging = false;
 
         if (x > thresholdX) this.onThresholdReached(SWIPE_RIGHT);
         else if (x < -thresholdX) this.onThresholdReached(SWIPE_LEFT);
-        else if (y < -thresholdY) this.onThresholdReached(SWIPE_TOP);
-        else if (y > thresholdY) this.onThresholdReached(SWIPE_BOTTOM);
         else this.setPosition({ x: 0, y: 0, rotation: 0 });
       },
     });
@@ -114,7 +100,7 @@ export default {
   },
   methods: {
     onThresholdReached(interaction) {
-      const { outOfSightXOffset, outOfSightYOffset, maxRotation } = this.$props;
+      const { outOfSightXOffset, maxRotation } = this.$props;
       this.unsetInteractElement();
       switch (interaction) {
         case SWIPE_RIGHT:
@@ -130,18 +116,6 @@ export default {
             rotation: -maxRotation,
           });
           this.$emit(SWIPE_LEFT);
-          break;
-        case SWIPE_TOP:
-          this.setPosition({
-            y: -outOfSightYOffset,
-          });
-          this.$emit(SWIPE_TOP);
-          break;
-        case SWIPE_BOTTOM:
-          this.setPosition({
-            y: outOfSightYOffset,
-          });
-          this.$emit(SWIPE_BOTTOM);
           break;
       }
       this.$emit(SWIPE_ANY, interaction);
