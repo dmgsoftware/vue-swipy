@@ -1,6 +1,6 @@
 {
   "name": "vue-swipy",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Vue swipeable component",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,6 @@
   "author": "Darko Macesic <darko@shardlabs.io>",
   "license": "MIT",
   "dependencies": {
-    "interactjs": "^1.10.1"
+    "interactjs": "^1.10.26"
   }
 }

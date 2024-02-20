@@ -44,6 +44,11 @@ export default {
       type: Number,
       default: 50,
       required: false,
+    },
+    displayed: {
+      type: Boolean,
+      default: true,
+      required: false
     }
   },
   data() {
@@ -66,34 +71,7 @@ export default {
     },
   },
   mounted() {
-    const element = this.$refs.interactElement;
-    interact(element).draggable({
-      onstart: () => {
-        this.$emit(INTERACT_ON_START);
-        this.isDragging = true;
-      },
-      onmove: (event) => {
-        this.$emit(INTERACT_ON_MOVE);
-        const { maxRotation, thresholdX } = this.$props;
-        const x = this.interactPosition.x + event.dx;
-        const y = this.interactPosition.y + event.dy;
-        let rotation = maxRotation * (x / thresholdX);
-        if (rotation > maxRotation) rotation = maxRotation;
-        else if (rotation < -maxRotation) rotation = -maxRotation;
-
-        this.setPosition({ x, y, rotation });
-      },
-      onend: () => {
-        this.$emit(INTERACT_ON_END);
-        const { x} = this.interactPosition;
-        const { thresholdX } = this.$props;
-        this.isDragging = false;
-
-        if (x > thresholdX) this.onThresholdReached(SWIPE_RIGHT);
-        else if (x < -thresholdX) this.onThresholdReached(SWIPE_LEFT);
-        else this.setPosition({ x: 0, y: 0, rotation: 0 });
-      },
-    });
+    this.setInteractElement();
   },
   beforeDestroy() {
     this.unsetInteractElement();
@@ -124,9 +102,48 @@ export default {
       const { x = 0, y = 0, rotation = 0 } = position;
       this.interactPosition = { x, y, rotation };
     },
+    setInteractElement() {
+      const element = this.$refs.interactElement;
+      interact(element).draggable({
+        onstart: () => {
+          this.$emit(INTERACT_ON_START);
+          this.isDragging = true;
+        },
+        onmove: (event) => {
+          this.$emit(INTERACT_ON_MOVE);
+          const { maxRotation, thresholdX } = this.$props;
+          const x = this.interactPosition.x + event.dx;
+          const y = this.interactPosition.y + event.dy;
+          let rotation = maxRotation * (x / thresholdX);
+          if (rotation > maxRotation) rotation = maxRotation;
+          else if (rotation < -maxRotation) rotation = -maxRotation;
+
+          this.setPosition({ x, y, rotation });
+        },
+        onend: () => {
+          this.$emit(INTERACT_ON_END);
+          const { x } = this.interactPosition;
+          const { thresholdX } = this.$props;
+          this.isDragging = false;
+
+          if (x > thresholdX) this.onThresholdReached(SWIPE_RIGHT);
+          else if (x < -thresholdX) this.onThresholdReached(SWIPE_LEFT);
+          else this.setPosition({ x: 0, y: 0, rotation: 0 });
+        },
+      });
+    },
     unsetInteractElement() {
       interact(this.$refs.interactElement).unset();
     },
+  },
+  watch: {
+    //in case we want the swipeable back in view
+    displayed(newDisplay, oldDisplay) {
+      if (newDisplay && !oldDisplay) {
+        this.setPosition({ x:0, y:0, rotation:0 });
+        this.setInteractElement()
+      }
+    }
   },
 };
 </script>
