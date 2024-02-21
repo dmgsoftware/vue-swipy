@@ -1,6 +1,6 @@
 {
   "name": "vue-swipy",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Vue swipeable component",
   "main": "index.js",
   "scripts": {

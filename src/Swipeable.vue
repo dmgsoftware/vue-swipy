@@ -18,6 +18,7 @@ const INTERACT_ON_START = "start";
 const INTERACT_ON_MOVE = "move";
 const INTERACT_ON_END = "end";
 
+const SWIPE_NONE = "swipe-none";
 const SWIPE_LEFT = "swipe-left";
 const SWIPE_RIGHT = "swipe-right";
 const SWIPE_ANY = "swipe";
@@ -45,19 +46,24 @@ export default {
       default: 50,
       required: false,
     },
-    displayed: {
-      type: Boolean,
-      default: true,
-      required: false
-    }
+    initialStatus: {
+      type: String,
+      default: SWIPE_NONE,
+      required: false,
+    },
   },
   data() {
     return {
-      isDragging: true,
+      isDragging: false,
       interactPosition: {
         x: 0,
         y: 0,
         rotation: 0,
+      },
+      status: {
+        type: String,
+        default: SWIPE_NONE,
+        required: false,
       },
     };
   },
@@ -70,30 +76,45 @@ export default {
       return !this.isDragging && this.$props.transition;
     },
   },
+  created() {
+    this.status = this.initialStatus;
+    const { outOfSightXOffset, maxRotation } = this.$props;
+    if (this.status === SWIPE_RIGHT) {
+      this.setPosition({
+        x: outOfSightXOffset,
+        rotation: maxRotation,
+      });
+    } else if (this.status === SWIPE_LEFT) {
+      this.setPosition({
+        x: -outOfSightXOffset,
+        rotation: -maxRotation,
+      });
+    } else if (this.status === SWIPE_NONE) {
+      this.setPosition({ x: 0, y: 0, rotation: 0 });
+    }
+  },
   mounted() {
-    this.setInteractElement();
+    if (this.status === SWIPE_NONE) {
+      this.setInteractElement();
+    }
+  },
+  beforeUpdate() {
+    if (this.status !== SWIPE_NONE) {
+      this.unsetInteractElement();
+    }
   },
   beforeDestroy() {
     this.unsetInteractElement();
   },
   methods: {
     onThresholdReached(interaction) {
-      const { outOfSightXOffset, maxRotation } = this.$props;
       this.unsetInteractElement();
+
       switch (interaction) {
         case SWIPE_RIGHT:
-          this.setPosition({
-            x: outOfSightXOffset,
-            rotation: maxRotation,
-          });
-          this.$emit(SWIPE_RIGHT);
-          break;
         case SWIPE_LEFT:
-          this.setPosition({
-            x: -outOfSightXOffset,
-            rotation: -maxRotation,
-          });
-          this.$emit(SWIPE_LEFT);
+          this.setStatus(interaction);
+          this.$emit(interaction);
           break;
       }
       this.$emit(SWIPE_ANY, interaction);
@@ -104,6 +125,7 @@ export default {
     },
     setInteractElement() {
       const element = this.$refs.interactElement;
+
       interact(element).draggable({
         onstart: () => {
           this.$emit(INTERACT_ON_START);
@@ -114,6 +136,7 @@ export default {
           const { maxRotation, thresholdX } = this.$props;
           const x = this.interactPosition.x + event.dx;
           const y = this.interactPosition.y + event.dy;
+
           let rotation = maxRotation * (x / thresholdX);
           if (rotation > maxRotation) rotation = maxRotation;
           else if (rotation < -maxRotation) rotation = -maxRotation;
@@ -135,15 +158,32 @@ export default {
     unsetInteractElement() {
       interact(this.$refs.interactElement).unset();
     },
-  },
-  watch: {
-    //in case we want the swipeable back in view
-    displayed(newDisplay, oldDisplay) {
-      if (newDisplay && !oldDisplay) {
-        this.setPosition({ x:0, y:0, rotation:0 });
-        this.setInteractElement()
+    setStatus(status) {
+      if (this.status === status) {
+        return;
       }
-    }
+
+      this.status = status;
+      const { outOfSightXOffset, maxRotation } = this.$props;
+
+      if (this.status === SWIPE_RIGHT) {
+        this.setPosition({
+          x: outOfSightXOffset,
+          rotation: maxRotation,
+        });
+      } else if (this.status === SWIPE_LEFT) {
+        this.setPosition({
+          x: -outOfSightXOffset,
+          rotation: -maxRotation,
+        });
+      } else if (this.status === SWIPE_NONE) {
+        this.setPosition({ x: 0, y: 0, rotation: 0 });
+        this.setInteractElement();
+      }
+    },
+    getStatus() {
+      return this.status;
+    },
   },
 };
 </script>
