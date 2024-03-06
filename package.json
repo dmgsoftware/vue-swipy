@@ -18,9 +18,12 @@
   "author": "Darko Macesic <darko@shardlabs.io>",
   "license": "MIT",
   "dependencies": {
-    "interactjs": "^1.10.26"
+    "@interactjs/actions": "^1.10.26",
+    "@interactjs/auto-start": "^1.10.26",
+    "@interactjs/interact": "^1.10.26"
   },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vue": "^3.4.21"
   }
 }

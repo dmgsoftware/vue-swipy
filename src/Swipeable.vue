@@ -1,5 +1,7 @@
 <script lang="ts">
-import interact from 'interactjs'
+import '@interactjs/auto-start'
+import '@interactjs/actions/drag'
+import interact from '@interactjs/interact'
 import type { PropType } from 'vue'
 
 enum INTERACT {
@@ -16,7 +18,6 @@ export enum SWIPE {
 }
 
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Swipeable',
   props: {
     transition: {
