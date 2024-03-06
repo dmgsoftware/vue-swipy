@@ -36,9 +36,8 @@ npm install vue-swipy
 </template>
 
 <script>
-import { Swipeable } from "vue-swipy";
-
-const SWIPE_NONE = "swipe-none";
+import Swipeable from "vue-swipy";
+import { SWIPE } from "vue-swipy";
 
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
@@ -83,7 +82,7 @@ export default {
       this.currentIndex--;
 
       const lastSwiped = this.$refs['swipeable' + this.currentIndex][0];
-      lastSwiped.setStatus(SWIPE_NONE);
+      lastSwiped.setStatus(SWIPE.NONE);
     }
   },
 };
