@@ -1,0 +1,1 @@
+body{margin:0}#app{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;min-height:20em;width:100vw}#swipeable-container{position:relative;height:400px;width:250px;z-index:0;margin:2rem}button{margin-bottom:2rem}
